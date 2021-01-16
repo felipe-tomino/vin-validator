@@ -1,5 +1,5 @@
 class VIN
-  @@CHECK_DIGITS = ['0','1','2','3','4','5','6','7','9','10','X']
+  @@CHECK_DIGITS = ['0','1','2','3','4','5','6','7','8','9','10','X']
   @@WEIGHTS = [8,7,6,5,4,3,2,10,0,9,8,7,6,5,4,3,2]
   @@VALID_CHARS = '0123456789ABCDEFGHJKLMNPRSTUVWXYZ'
   @@transliterate_chars = '0123456789.ABCDEFGH..JKLMN.P.R..STUVWXYZ'
@@ -52,22 +52,21 @@ class VIN
     else
       base_vin = self
     end
-    # 2XPBDP9X8FD257820
+
     if base_vin.is_all_char_valid()
       base_vin.id.split('').each_with_index do |char, i|
         if i != 8
           (0..9).each do |possible_char_idx|
             new_sum = base_vin.sum() + (possible_char_idx - transliterate(char)) * @@WEIGHTS[i]
-            if @@CHECK_DIGITS[new_sum % 11] == base_vin.id[8]
+            if (new_sum % 11).to_s == base_vin.id[8]
               self.get_possible_chars_from_value(possible_char_idx).each do |c|
-                new_vin = base_vin.id[0, i] + c + base_vin.id[i + 1, 17]
-                puts "#{base_vin.sum()} // #{new_vin}"
+                new_vin = base_vin.id[0, i].to_s + c + base_vin.id[i + 1, 17].to_s
                 suggested_vins.append(new_vin)
               end
             end
           end
         else
-          new_vin = base_vin.id[0, 9] + base_vin.calculate_check_digit() + base_vin.id[10, 17]
+          new_vin = base_vin.id[0, 8] + base_vin.calculate_check_digit() + base_vin.id[9, 17]
           suggested_vins.append(new_vin)
         end
       end
@@ -81,6 +80,6 @@ class VIN
   end
 
   def get_possible_chars_from_value(value)
-    (0..3).map { |i| @@transliterate_chars[i] }.filter { |c| c != '.' }
+    (0..3).map { |i| @@transliterate_chars[value + i * 10] }.filter { |c| c != '.' }
   end
 end
