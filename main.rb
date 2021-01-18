@@ -9,4 +9,5 @@ if vin.is_check_digit_valid()
 else
   puts "Check Digit: VALID || INVALID\nSuggested VIN(s):"
   suggested_vins = vin.suggested_vins()
+  puts "\t- #{suggested_vins.join("\n\t- ")}"
 end
